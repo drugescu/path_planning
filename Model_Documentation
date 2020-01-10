@@ -1,0 +1,30 @@
+My current model works according to rules considered as common sense by myself, and described below. In addition, it is overly cautious with spacing between the cars. 
+
+Mechanisms employed:
+
+*) Anti-swerve (timer during which lane changes aren't allowed).
+*) P-controller on safe distance to car ahead (d = 30). If closer, the car slows down till it keeps distance d = 30.
+*) Anti-lane change when slow (for example when starting) to prevent right-lane cars from rear-ending us as we change lanes at 10 mph.
+*) Lane changes take into account distance and speed of cars in the lane we need to change into. For example if the car is slower and behind us, we can change lanes closer to it compared to it being faster. The same for when it is in front but faster or slower.
+*) Lane change impulse: if there is something close ahead, and a lane close to us is open, and speed is not maximum, swerve into it with a slight speed boost (since a diagonal motion will cancel some of our forward motion and basically slow us down along the d axis!).
+*) Prefer right lane: if road is clear, prefer the right-most (slowest) lane, unless there is a slow car ahead (d <= 70) (we will wait to pass it and then change lane since it doesn't make sense to change there and back too often).
+*) Adaptive breaking dependent on distance.
+*) Emergency break: even if the controller shouldn't permit distance to a car ahead to be really tiny, some car might merge into our lane or break really fast. If d < 8, there is an emergency break which likely will fail the project (register as incident) but will save the driver. I believe such incidents should be tolerated (emergency breaking) because some of the simulator cars WILL merge into you (though somewhat rarely).
+*) Somewhat more robust lane-detection (a car can be in both lanes at the same time - of course, when shifting lanes) so when the center of the car is at the edge, half the car is already in OUR lane for example, and we can crash into it. We should emergency break even if the adjacent car is not fully in our lane.
+*) When there is no car ahead, the car will accelerate more vigurously. This situation occurs for example when starting the simulator and is meant to "simulate" merging into the highway which whereby you need to get to the speed of the traffic as fast as possible on the acceleration portion of the merging lane. Otherwise the car accelerates moderately.
+
+Situations which should be taken into account and aren't:
+*) A car merges into lane 1 while you also merge into lane 1 from the opposite lane. Crash.
+
+The number of points of our path is 20 ahead for better reactivity compared to the default 50. There are also 4 points curved by a spline aid and interpolated through, spaced 30m apart.
+
+------------------------------------------------------------------------------------------------------------------------------------------------------
+
+Bonus:
+*) There is "dynamic driving" mode implemented which can be enabled on line 65 by making "dynamic_driving = 1.0f" and which will fail the accel/jerk/speed limits but simulate a "bimmer [donkey synonym]" with the following criteria:
+ - speed limit is a suggestion
+ - only shift right if no other choice, otherwise stay in your lane or to the left
+ - scare drivers in our lane if too slow by simulating crashing into them or shifting into them
+ - swerve across multiple lanes
+ - change lanes with little regard to distance among cars
+ - make an effort to not hit the car, after all, second-hand bimmers from Germany driven by old ladies to church on Sundays are as expensive as new, warranty-covered, unfarted-in cars bought by plebes.
